@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const registroController = require('../controller/registro.controller');
 
+router.post('/', registroController.registrarUsuario); // 🔹 Aquí debe coincidir el nombre de la función
 
-
-router.post('/', registroController.registrarVehiculo);
-
-module.exports = router; // ✅ exporta el router
+module.exports = router;

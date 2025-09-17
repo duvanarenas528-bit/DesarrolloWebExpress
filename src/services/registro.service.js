@@ -1,13 +1,20 @@
+// src/services/registro.service.js
 const db = require('../config/db');
 
-
-const create = async (vehiculo) => {
-  const { placa, nombre, tipo, telefono, fecha_ingreso, servicios } = vehiculo;
+exports.create = async ({ idTipoID, nombre, apellido, correo, contraseña, idGenero }) => {
   const query = `
-    INSERT INTO vehiculos (placa, nombre, tipo_vehiculo, telefono, fecha_ingreso, servicios)
+    INSERT INTO usuarios (idTipoID, nombre, apellido, correo, contraseña, idGenero)
     VALUES (?, ?, ?, ?, ?, ?)
   `;
-  await pool.query(query, [placa, nombre, tipo, telefono, fecha_ingreso, servicios]);
-};
 
-module.exports = { create };
+  const [result] = await db.execute(query, [
+    idTipoID,
+    nombre,
+    apellido,
+    correo,
+    contraseña,
+    idGenero
+  ]);
+
+  return result.insertId; // devuelve el ID del usuario creado
+};

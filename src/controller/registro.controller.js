@@ -1,23 +1,27 @@
 const registroService = require('../services/registro.service');
 
-const registrarVehiculo = async (req, res) => {
+exports.registrarUsuario = async (req, res) => {
   try {
-    const { placa, nombre, tipo, telefono, fecha_ingreso, servicios } = req.body;
+    const { idTipoID, nombre, apellido, correo, contraseña, idGenero } = req.body;
 
-    await registroService.create({
-      placa,
+    // Validación
+    if (!idTipoID || !nombre || !apellido || !correo || !contraseña || !idGenero) {
+      return res.status(400).json({ message: "Todos los campos son obligatorios" });
+    }
+
+    // Crear usuario
+    const userId = await registroService.create({
+      idTipoID,
       nombre,
-      tipo,
-      telefono,
-      fecha_ingreso,
-      servicios: servicios?.join(', ') || 'Ninguno'
+      apellido,
+      correo,
+      contraseña,
+      idGenero
     });
 
-    res.status(201).json({ message: 'Vehículo registrado correctamente' });
+    res.status(201).json({ message: "Usuario registrado correctamente", userId });
   } catch (error) {
-    console.error('Error en registro.controller:', error);
-    res.status(500).json({ message: 'Error al registrar vehículo' });
+    console.error("Error en registro.controller:", error);
+    res.status(500).json({ message: "Error al registrar usuario", error: error.message });
   }
 };
-
-module.exports = { registrarVehiculo };

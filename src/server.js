@@ -1,7 +1,7 @@
 // src/server.js
 const express = require('express');
 const dotenv = require('dotenv');
-const db = require('./config/db'); // pool de MySQL2/promise
+const db = require('./config/db'); // Pool de MySQL2/promise
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware para parsear JSON
 app.use(express.json());
 
-// Rutas
+// Importar rutas
 const usuariosRoutes = require('./routers/usuarios.routes');
 const vehiculosRoutes = require('./routers/vehiculos.routes');
 const reportesRoutes = require('./routers/reportes.routes');
@@ -28,6 +28,17 @@ app.use('/api/pagos', pagosRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/login', loginRoutes);
 app.use('/api/registro', registroRoutes);
+
+// Test de conexión a la base de datos
+(async () => {
+  try {
+    await db.getConnection(); // Verifica que se pueda conectar
+    console.log('✅ Conectado a la base de datos');
+  } catch (err) {
+    console.error('❌ Error de conexión a la base de datos:', err.message);
+    process.exit(1);
+  }
+})();
 
 // Iniciar servidor
 app.listen(PORT, () => {
