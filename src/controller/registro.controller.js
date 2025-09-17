@@ -1,4 +1,4 @@
-const registroService = require('../services/registro.services');
+const registroService = require('../services/registro.service');
 
 const registrarVehiculo = async (req, res) => {
   try {

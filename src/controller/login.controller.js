@@ -5,9 +5,7 @@ exports.login = async (req, res) => {
         const { correo, contraseña } = req.body;
         const user = await loginService.login(correo, contraseña);
 
-        if (!user) {
-            return res.status(401).json({ message: "Credenciales inválidas" });
-        }
+        if (!user) return res.status(401).json({ message: "Credenciales inválidas" });
 
         res.status(200).json({ message: "Login exitoso", user });
     } catch (error) {

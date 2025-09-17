@@ -1,4 +1,5 @@
-const pool = require('../db');
+const db = require('../config/db');
+
 
 const create = async (vehiculo) => {
   const { placa, nombre, tipo, telefono, fecha_ingreso, servicios } = vehiculo;

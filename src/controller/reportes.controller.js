@@ -1,4 +1,5 @@
-const reporteService = require('../services/reporte.service');
+const reportesService = require('../services/reportes.service'); 
+
 
 exports.getEstadisticas = async (req, res) => {
     try {

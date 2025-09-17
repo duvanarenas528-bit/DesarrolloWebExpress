@@ -1,4 +1,3 @@
-// app.js
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -7,23 +6,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Importar routes
-const loginRoutes = require("./login.routes");
-const registroRoutes = require("./registro.routes");
-const usuariosRoutes = require("./usuarios.routes");
-const vehiculosRoutes = require("./vehiculos.routes");
-const reportesRoutes = require("./reportes.routes");
-const pagosRoutes = require("./pagos.routes");
+// Routers
+const loginRoutes = require("./routers/login.routes");
+const registroRoutes = require("./routers/registro.routes");
+const usuariosRoutes = require("./routers/usuarios.routes");
+const vehiculosRoutes = require("./routers/vehiculos.routes");
+const reportesRoutes = require("./routers/reportes.routes");
+const pagosRoutes = require("./routers/pagos.routes");
 
-// Usar routes
-app.use("/api", loginRoutes);
-app.use("/api", registroRoutes);
-app.use("/api", usuariosRoutes);
-app.use("/api", vehiculosRoutes);
-app.use("/api", reportesRoutes);
-app.use("/api", pagosRoutes);
+app.use("/api/login", loginRoutes);
+app.use("/api/registro", registroRoutes);
+app.use("/api/usuarios", usuariosRoutes);
+app.use("/api/vehiculos", vehiculosRoutes);
+app.use("/api/reportes", reportesRoutes);
+app.use("/api/pagos", pagosRoutes);
 
+// Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });

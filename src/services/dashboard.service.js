@@ -1,4 +1,4 @@
-const db = require('../config/db.config');
+const db = require('../config/db');
 
 exports.getDashboardData = async () => {
     const [usuarios] = await db.execute('SELECT COUNT(*) AS total FROM usuarios');

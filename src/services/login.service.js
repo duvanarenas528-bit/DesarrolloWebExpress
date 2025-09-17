@@ -1,4 +1,4 @@
-const db = require('../config/db.config');
+const db = require('../config/db');
 
 exports.login = async (correo, contraseña) => {
     const [rows] = await db.execute(

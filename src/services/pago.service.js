@@ -1,4 +1,4 @@
-const db = require('../config/db.config');
+const db = require('../config/db');
 
 exports.findAll = async () => {
     const [rows] = await db.execute('SELECT * FROM pagos');
