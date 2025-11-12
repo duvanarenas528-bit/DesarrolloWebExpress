@@ -13,3 +13,9 @@ exports.createUsuario = async (data) => {
   );
   return { id: result.insertId, nombre, email };
 };
+
+// 🔥 Nuevo método para autenticación (login)
+exports.findByEmail = async (email) => {
+  const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
+  return rows[0] || null;
+};
