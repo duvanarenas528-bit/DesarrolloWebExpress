@@ -1,67 +1,116 @@
-/* Fuente y fondo */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #2563eb, #1e3a8a);
-  color: white;
+/* Fondo que cubre toda la ventana */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* oscurece el fondo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* asegúrate de que quede sobre todo */
 }
 
-/* Centrado total */
+/* Contenedor del modal */
+.modal {
+  background-color: #000;
+  color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 350px;
+  max-width: 90%;
+  text-align: center;
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Botón de cerrar */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #FFD700;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Botones principales */
+.btn-primary {
+  background-color: #FFD700;
+  color: #000;
+  font-weight: bold;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #e6c200;
+}
+
+/* Inputs */
+.modal input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+}
+
+/* Animación suave */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Mensajes */
+.mensaje {
+  margin-top: 10px;
+  color: #FFD700;
+  font-weight: bold;
+}
 .App {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
+  justify-content: center;
+  height: 100vh; /* centra verticalmente */
+  background-color: #000; /* fondo oscuro elegante */
+  color: #fff;
   text-align: center;
-  animation: fadeInDown 0.8s ease-in-out;
+  font-family: 'Poppins', sans-serif;
 }
 
-
-.App h1 {
-  font-size: 2.5rem;
-  margin-bottom: 30px;
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #FFD700; /* dorado */
 }
 
-
-.App button {
-  background-color: white;
-  color: #1e3a8a;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 8px;
-  font-size: 1rem;
+button {
+  background-color: #FFD700;
+  color: #000;
   font-weight: bold;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  font-size: 1rem;
+  transition: background 0.2s ease-in-out;
 }
 
-.App button:hover {
-  background-color: #dbeafe;
-  transform: scale(1.05);
-}
-
-
-.modal-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-}
-
-/* Animación */
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+button:hover {
+  background-color: #e6c200;
 }

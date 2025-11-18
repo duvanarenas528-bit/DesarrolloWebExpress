@@ -8,14 +8,38 @@ function App() {
   const [user, setUser] = useState(null);
 
   return (
-    <div className="App">
+    <div className="App" style={{ textAlign: "center", marginTop: "50px" }}>
       {!user ? (
         <>
-          <h1>🚗 Bienvenido a Parking Now 🚗</h1>
-          <button onClick={() => setShowModal(true)}>
+          {/* Logo solo en bienvenida */}
+          <img
+            src="/logo.png"   // Asegúrate de poner tu imagen en public/logo.png
+            alt="Logo Parking Now"
+            style={{ height: "100px", marginBottom: "20px" }}
+          />
+
+          {/* Título */}
+          <h1>Bienvenido a Parking Now</h1>
+
+          {/* Botón de inicio */}
+          <button
+            onClick={() => setShowModal(true)}
+            style={{
+              marginTop: "20px",
+              padding: "12px 25px",
+              fontSize: "16px",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              backgroundColor: "#FFD700",
+              color: "#000",
+              fontWeight: "bold",
+            }}
+          >
             Iniciar sesión / Registrarse
           </button>
 
+          {/* Modal de autenticación */}
           {showModal && (
             <AuthModal
               onClose={() => setShowModal(false)}
@@ -24,7 +48,7 @@ function App() {
           )}
         </>
       ) : (
-        <Dashboard user={user} />
+        <Dashboard user={user} onLogout={() => setUser(null)} />
       )}
     </div>
   );

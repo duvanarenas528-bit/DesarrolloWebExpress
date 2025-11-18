@@ -1,0 +1,83 @@
+/* Fondo que cubre toda la ventana */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8); /* oscurece el fondo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* asegúrate de que quede sobre todo */
+}
+
+/* Contenedor del modal */
+.modal {
+  background-color: #000;
+  color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 350px;
+  max-width: 90%;
+  text-align: center;
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+  position: relative;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Botón de cerrar */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #FFD700;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Botones principales */
+.btn-primary {
+  background-color: #FFD700;
+  color: #000;
+  font-weight: bold;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #e6c200;
+}
+
+/* Inputs */
+.modal input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+}
+
+/* Animación suave */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Mensajes */
+.mensaje {
+  margin-top: 10px;
+  color: #FFD700;
+  font-weight: bold;
+}
