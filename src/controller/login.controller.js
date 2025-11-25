@@ -1,43 +1,54 @@
-// src/controller/login.controller.js
-const db = require("../config/db");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
+const db = require('../config/db');
+const bcrypt = require('bcryptjs');
 
 exports.login = async (req, res) => {
   const { correo, contraseña } = req.body;
 
   try {
-    const [rows] = await db.query("SELECT * FROM usuarios WHERE correo = ?", [correo]);
+    const [rows] = await db.query(
+      "SELECT * FROM usuarios WHERE correo = ?",
+      [correo]
+    );
+
     if (rows.length === 0) {
-      return res.status(401).json({ error: "Usuario no encontrado" });
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    const user = rows[0];
+    const usuario = rows[0];
 
-    // Comparar la contraseña con bcrypt
-    const validPassword = await bcrypt.compare(contraseña, user.contraseña);
-    if (!validPassword) {
-      return res.status(401).json({ error: "Credenciales no válidas" });
+    // Comparar contraseña correctamente
+    const passwordOk = await bcrypt.compare(contraseña, usuario.contraseña);
+
+    if (!passwordOk) {
+      return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // Crear token
-    const token = jwt.sign({ id: user.idUsuario, correo: user.correo }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    // Crear token con el rol del usuario
+    const token = jwt.sign(
+      {
+        id: usuario.idUsuario,
+        correo: usuario.correo,
+        nombre: usuario.nombre,
+        rol: usuario.rol, // Usa el rol que viene desde la BD
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
 
-    // 🟢 Devuelve datos del usuario y token
     res.json({
-      message: "Inicio de sesión exitoso",
+      message: "Login exitoso",
       token,
       usuario: {
-        idUsuario: user.idUsuario,
-        nombre: user.nombre,
-        apellido: user.apellido,
-        correo: user.correo,
+        id: usuario.idUsuario,
+        nombre: usuario.nombre,
+        correo: usuario.correo,
+        rol: usuario.rol,
       },
     });
+
   } catch (error) {
     console.error("Error en login:", error);
-    res.status(500).json({ error: "Error del servidor" });
+    res.status(500).json({ message: "Error al iniciar sesión" });
   }
 };

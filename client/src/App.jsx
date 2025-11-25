@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AuthModal from "./components/AuthModal";
 import Dashboard from "./pages/dashboard";
+import DashboardAdmin from "./pages/dashboardAdmin";
 import "./App.css";
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
         <>
           {/* Logo solo en bienvenida */}
           <img
-            src="/logo.png"   // Asegúrate de poner tu imagen en public/logo.png
+            src="/logo.png" // Asegúrate de poner tu imagen en public/logo.png
             alt="Logo Parking Now"
             style={{ height: "100px", marginBottom: "20px" }}
           />
@@ -43,12 +44,19 @@ function App() {
           {showModal && (
             <AuthModal
               onClose={() => setShowModal(false)}
-              onAuthSuccess={(data) => setUser(data)}
+              onAuthSuccess={(data) => setUser(data)} // data debe incluir rol y token
             />
           )}
         </>
       ) : (
-        <Dashboard user={user} onLogout={() => setUser(null)} />
+        <>
+          {/* Dashboard según rol */}
+          {user.rol === "2" || user.rol === 2 ? (
+            <DashboardAdmin user={user} token={user.token} onLogout={() => setUser(null)} />
+          ) : (
+            <Dashboard user={user} onLogout={() => setUser(null)} />
+          )}
+        </>
       )}
     </div>
   );

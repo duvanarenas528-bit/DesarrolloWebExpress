@@ -1,20 +1,26 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-// Middleware para verificar el token JWT
 exports.verifyToken = (req, res, next) => {
-  const header = req.headers['authorization'];
-  
+  const header = req.headers["authorization"];
+
   if (!header) {
-    return res.status(403).json({ message: 'Token requerido' });
+    return res.status(403).json({ message: "Token requerido" });
   }
 
-  const token = header.split(' ')[1]; // "Bearer token"
+  const token = header.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Guarda los datos del usuario en la request
+    req.user = decoded; 
     next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Token inválido o expirado' });
+  } catch (err) {
+    return res.status(401).json({ message: "Token inválido" });
   }
+};
+
+exports.soloAdmin = (req, res, next) => {
+  if (req.user.rol !== 2) {
+    return res.status(403).json({ message: "Acceso denegado: Solo Admin" });
+  }
+  next();
 };
