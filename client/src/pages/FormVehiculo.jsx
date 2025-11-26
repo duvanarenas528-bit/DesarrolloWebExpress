@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 
-const FormVehiculo = ({ onClose, userId }) => {
+const FormVehiculo = ({ onClose, userId, token }) => {
   const [form, setForm] = useState({
     placa: "",
     nombre: "",
     tipo_vehiculo: "",
     telefono: "",
-    fecha_ingreso: new Date().toISOString().slice(0, 10), // hoy
-    idPersona: userId, // asigna el usuario logueado automáticamente
+    fecha_ingreso: new Date().toISOString().slice(0, 10),
+    servicios: "",
+    fecha: "",
+    hora: "",
   });
 
   const handleChange = (e) => {
@@ -18,19 +20,53 @@ const FormVehiculo = ({ onClose, userId }) => {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3000/api/vehiculos", {
+      console.log("📤 Enviando vehículo:", form);
+
+      // 1️⃣ Crear vehículo
+      const resVeh = await fetch("http://localhost:3000/api/vehiculos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,   // ← TOKEN
+        },
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();
-      console.log("Vehículo registrado:", data);
-      alert("Vehículo registrado correctamente!");
+      const dataVeh = await resVeh.json();
+      console.log("📥 RESPUESTA BACKEND VEHÍCULO:", dataVeh);
+
+      if (!dataVeh.idVehiculo) {
+        alert("❌ Error registrando vehículo: no se recibió idVehiculo");
+        return;
+      }
+
+      const idVehiculo = dataVeh.idVehiculo;
+
+      // 2️⃣ Crear agendamiento
+      const agendamientoData = {
+        idVehiculo,
+        idPersona: userId,
+        fecha: form.fecha,
+        hora: form.hora,
+      };
+
+      const resAg = await fetch("http://localhost:3000/agendamientos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(agendamientoData),
+      });
+
+      const dataAg = await resAg.json();
+      console.log("📥 RESPUESTA AGENDAMIENTO:", dataAg);
+
+      alert("✅ Vehículo agendado correctamente");
       onClose();
+
     } catch (error) {
-      console.error("Error al registrar vehículo:", error);
-      alert("Error al registrar vehículo");
+      console.error("❌ Error final:", error);
+      alert("Error registrando vehículo");
     }
   };
 
@@ -63,72 +99,29 @@ const FormVehiculo = ({ onClose, userId }) => {
       >
         <h2>Registrar Vehículo</h2>
 
-        <input
-          type="text"
-          name="placa"
-          placeholder="Placa"
-          value={form.placa}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="nombre"
-          placeholder="Nombre del propietario"
-          value={form.nombre}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="tipo_vehiculo"
-          placeholder="Tipo de vehículo"
-          value={form.tipo_vehiculo}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="tel"
-          name="telefono"
-          placeholder="Teléfono"
-          value={form.telefono}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="date"
-          name="fecha_ingreso"
-          value={form.fecha_ingreso}
-          onChange={handleChange}
-          required
-        />
+        <input name="placa" placeholder="Placa" value={form.placa} onChange={handleChange} required />
+        <input name="nombre" placeholder="Nombre del propietario" value={form.nombre} onChange={handleChange} required />
+        <input name="tipo_vehiculo" placeholder="Tipo de vehículo" value={form.tipo_vehiculo} onChange={handleChange} required />
+        <input name="telefono" placeholder="Teléfono" value={form.telefono} onChange={handleChange} required />
+        <input type="date" name="fecha_ingreso" value={form.fecha_ingreso} onChange={handleChange} required />
+        <input name="servicios" placeholder="Servicios (opcional)" value={form.servicios} onChange={handleChange} />
 
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
-          <button type="submit" style={{ ...botonEstilo, flex: 1, marginRight: "10px" }}>
+        <h3>Agendamiento</h3>
+
+        <input type="date" name="fecha" value={form.fecha} onChange={handleChange} required />
+        <input type="time" name="hora" value={form.hora} onChange={handleChange} required />
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <button type="submit" style={{ padding: "10px", background: "#FFD700", borderRadius: "8px", border: "none", cursor: "pointer" }}>
             Guardar
           </button>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{ ...botonEstilo, flex: 1, backgroundColor: "#ccc", color: "#000" }}
-          >
+          <button type="button" onClick={onClose} style={{ padding: "10px", background: "#ccc", borderRadius: "8px", border: "none", cursor: "pointer" }}>
             Cancelar
           </button>
         </div>
       </form>
     </div>
   );
-};
-
-const botonEstilo = {
-  padding: "12px",
-  border: "none",
-  borderRadius: "8px",
-  backgroundColor: "#FFD700",
-  color: "#000",
-  cursor: "pointer",
-  fontWeight: "bold",
-  fontSize: "15px",
 };
 
 export default FormVehiculo;

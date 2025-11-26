@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const db = require('../config/db');
-const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+const db = require("../config/db");
+const bcrypt = require("bcryptjs");
 
 exports.login = async (req, res) => {
   const { correo, contraseña } = req.body;
@@ -17,31 +17,33 @@ exports.login = async (req, res) => {
 
     const usuario = rows[0];
 
-    // Comparar contraseña correctamente
     const passwordOk = await bcrypt.compare(contraseña, usuario.contraseña);
 
     if (!passwordOk) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // Crear token con el rol del usuario
+    // 🔥 Crear token con datos reales de tu tabla
     const token = jwt.sign(
       {
-        id: usuario.idUsuario,
+        idPersona: usuario.idPersona,
         correo: usuario.correo,
-        nombre: usuario.nombre,
-        rol: usuario.rol, // Usa el rol que viene desde la BD
+        nombre: usuario.Nombre,
+        apellido: usuario.Apellido,
+        rol: usuario.rol,
       },
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
 
+    // 🔥 Devolver datos completos
     res.json({
       message: "Login exitoso",
       token,
       usuario: {
-        id: usuario.idUsuario,
-        nombre: usuario.nombre,
+        idPersona: usuario.idPersona,
+        nombre: usuario.Nombre,
+        apellido: usuario.Apellido,
         correo: usuario.correo,
         rol: usuario.rol,
       },

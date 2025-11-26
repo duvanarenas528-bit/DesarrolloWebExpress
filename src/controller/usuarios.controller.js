@@ -1,6 +1,9 @@
 const db = require("../config/db");
+const bcrypt = require("bcryptjs");
 
-// Obtener todos los usuarios
+// ===========================
+// Obtener TODOS los usuarios
+// ===========================
 exports.getUsuarios = async (req, res) => {
   try {
     const [rows] = await db.query("SELECT * FROM usuarios");
@@ -11,12 +14,16 @@ exports.getUsuarios = async (req, res) => {
   }
 };
 
-// Obtener usuario por ID
+// ===========================
+// Obtener usuario por idPersona
+// ===========================
 exports.getUsuarioPorId = async (req, res) => {
   try {
+    const { id } = req.params;
+
     const [rows] = await db.query(
-      "SELECT * FROM usuarios WHERE idUsuario = ?",
-      [req.params.id]
+      "SELECT * FROM usuarios WHERE idPersona = ?",
+      [id]
     );
 
     if (rows.length === 0) {
@@ -30,17 +37,116 @@ exports.getUsuarioPorId = async (req, res) => {
   }
 };
 
-// Crear usuario (no lo usaremos todavía)
-exports.createUsuario = (req, res) => {
-  res.json({ message: "Usuario creado" });
-};
-
+// ===========================
 // Actualizar usuario
-exports.updateUsuario = (req, res) => {
-  res.json({ message: `Usuario ${req.params.id} actualizado` });
+// ===========================
+exports.updateUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, apellido, correo } = req.body;
+
+    if (!nombre || !apellido || !correo) {
+      return res.status(400).json({ message: "Campos incompletos" });
+    }
+
+    await db.query(
+      "UPDATE usuarios SET Nombre=?, Apellido=?, correo=? WHERE idPersona=?",
+      [nombre, apellido, correo, id]
+    );
+
+    res.json({ message: "Usuario actualizado correctamente" });
+
+  } catch (error) {
+    console.error("Error actualizando usuario:", error);
+    res.status(500).json({ message: "Error actualizando usuario" });
+  }
 };
 
+// ===========================
+// Cambiar contraseña
+// ===========================
+exports.cambiarPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { actual, nueva } = req.body;
+
+    if (!actual || !nueva) {
+      return res.status(400).json({ message: "Campos incompletos" });
+    }
+
+    const [rows] = await db.query(
+      "SELECT contraseña FROM usuarios WHERE idPersona = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    const contraseñaReal = rows[0].contraseña;
+
+    const coincide = await bcrypt.compare(actual, contraseñaReal);
+    if (!coincide) {
+      return res.status(400).json({ message: "Contraseña actual incorrecta" });
+    }
+
+    const nuevaHash = await bcrypt.hash(nueva, 10);
+
+    await db.query(
+      "UPDATE usuarios SET contraseña=? WHERE idPersona=?",
+      [nuevaHash, id]
+    );
+
+    res.json({ message: "Contraseña cambiada correctamente" });
+
+  } catch (error) {
+    console.error("Error cambiando contraseña:", error);
+    res.status(500).json({ message: "Error cambiando contraseña" });
+  }
+};
+
+// ===========================
 // Eliminar usuario
-exports.deleteUsuario = (req, res) => {
-  res.json({ message: `Usuario ${req.params.id} eliminado` });
+// ===========================
+exports.deleteUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await db.query("DELETE FROM usuarios WHERE idPersona=?", [id]);
+
+    res.json({ message: "Cuenta eliminada correctamente" });
+
+  } catch (error) {
+    console.error("Error eliminando usuario:", error);
+    res.status(500).json({ message: "Error eliminando usuario" });
+  }
+};
+
+// ===========================
+// Subir foto de perfil
+// ===========================
+exports.subirFoto = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No se subió ninguna imagen" });
+    }
+
+    const nombreArchivo = req.file.filename;
+
+    await db.query(
+      "UPDATE usuarios SET foto=? WHERE idPersona=?",
+      [nombreArchivo, id]
+    );
+
+    res.json({
+      message: "Foto actualizada correctamente",
+      foto: nombreArchivo
+    });
+
+  } catch (error) {
+    console.error("Error subiendo foto:", error);
+    res.status(500).json({ message: "Error subiendo foto" });
+  }
 };

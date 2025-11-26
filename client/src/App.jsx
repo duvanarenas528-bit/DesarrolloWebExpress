@@ -1,28 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuthModal from "./components/AuthModal";
 import Dashboard from "./pages/dashboard";
 import DashboardAdmin from "./pages/dashboardAdmin";
+import HomePublic from "./pages/HomePublic";   // 👈 IMPORTANTE
 import "./App.css";
 
 function App() {
   const [showModal, setShowModal] = useState(false);
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [modoInvitado, setModoInvitado] = useState(false); // 👈 NUEVO
+
+  // Cargar usuario de localStorage si existe
+  useEffect(() => {
+    const savedUser = localStorage.getItem("usuario");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleAuthSuccess = (usuario, tokenRecibido) => {
+    setUser(usuario);
+    setToken(tokenRecibido);
+
+    localStorage.setItem("usuario", JSON.stringify(usuario));
+    localStorage.setItem("token", tokenRecibido);
+
+    setShowModal(false);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("token");
+  };
+
+  // 👈 Si el usuario entra como invitado → mostrar HomePublic
+  if (modoInvitado && !user) {
+    return <HomePublic onVolver={() => setModoInvitado(false)} />;
+  }
 
   return (
     <div className="App" style={{ textAlign: "center", marginTop: "50px" }}>
       {!user ? (
         <>
-          {/* Logo solo en bienvenida */}
           <img
-            src="/logo.png" // Asegúrate de poner tu imagen en public/logo.png
+            src="/logo.png"
             alt="Logo Parking Now"
             style={{ height: "100px", marginBottom: "20px" }}
           />
 
-          {/* Título */}
           <h1>Bienvenido a Parking Now</h1>
 
-          {/* Botón de inicio */}
+          {/* BOTÓN INVITADO */}
+          <button
+            onClick={() => setModoInvitado(true)}
+            style={{
+              marginTop: "20px",
+              padding: "12px 25px",
+              fontSize: "16px",
+              borderRadius: "8px",
+              border: "none",
+              cursor: "pointer",
+              backgroundColor: "#000",
+              color: "#FFD700",
+              fontWeight: "bold",
+              marginRight: "10px",
+            }}
+          >
+            Explorar como invitado 👀
+          </button>
+
+          {/* BOTÓN LOGIN */}
           <button
             onClick={() => setShowModal(true)}
             style={{
@@ -40,11 +90,10 @@ function App() {
             Iniciar sesión / Registrarse
           </button>
 
-          {/* Modal de autenticación */}
           {showModal && (
             <AuthModal
               onClose={() => setShowModal(false)}
-              onAuthSuccess={(data) => setUser(data)} // data debe incluir rol y token
+              onAuthSuccess={handleAuthSuccess}
             />
           )}
         </>
@@ -52,9 +101,17 @@ function App() {
         <>
           {/* Dashboard según rol */}
           {user.rol === "2" || user.rol === 2 ? (
-            <DashboardAdmin user={user} token={user.token} onLogout={() => setUser(null)} />
+            <DashboardAdmin
+              user={user}
+              token={token}
+              onLogout={handleLogout}
+            />
           ) : (
-            <Dashboard user={user} onLogout={() => setUser(null)} />
+            <Dashboard
+              user={user}
+              token={token}
+              onLogout={handleLogout}
+            />
           )}
         </>
       )}

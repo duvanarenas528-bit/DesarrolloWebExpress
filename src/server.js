@@ -1,52 +1,60 @@
+// server.js
+
 const express = require("express");
 const dotenv = require("dotenv");
-const cors = require("cors"); // <-- Importa CORS
+const cors = require("cors");
 const db = require("./config/db");
-const verifyRoutes = require("./routers/verify.routes");
 
+// Cargar variables de entorno
 dotenv.config();
 
-const app = express(); // <-- Primero creamos 'app'
+const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🟢 Configurar CORS antes de las rutas
+// CORS
 app.use(cors({
-  origin: "http://localhost:5173", // URL del frontend (Vite)
+  origin: "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
 
-// Middleware para parsear JSON
+// Middleware JSON
 app.use(express.json());
+app.use("/uploads", express.static("src/uploads"));
+
 
 // Importar rutas
+const loginRoutes = require("./routers/login.routes");
+const registroRoutes = require("./routers/registro.routes");
 const usuariosRoutes = require("./routers/usuarios.routes");
 const vehiculosRoutes = require("./routers/vehiculos.routes");
 const reportesRoutes = require("./routers/reportes.routes");
 const pagosRoutes = require("./routers/pagos.routes");
 const dashboardRoutes = require("./routers/dashboard.routes");
-const loginRoutes = require("./routers/login.routes");
-const registroRoutes = require("./routers/registro.routes");
+const agendamientosRoutes = require("./routers/agendamientos.routes");
+const verifyRoutes = require("./routers/verify.routes");
 const authRoutes = require("./routers/auth.routes");
 
 // Montar rutas
+
+app.use("/api/login", loginRoutes);
+app.use("/api/registro", registroRoutes);
 app.use("/api/usuarios", usuariosRoutes);
 app.use("/api/vehiculos", vehiculosRoutes);
+app.use("/agendamientos", agendamientosRoutes);
 app.use("/api/reportes", reportesRoutes);
 app.use("/api/pagos", pagosRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/login", loginRoutes);
-app.use("/api/registro", registroRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api", verifyRoutes);
 
-// Test de conexión a la base de datos
+// Test de BD
 (async () => {
   try {
     await db.getConnection();
     console.log("✅ Conectado a la base de datos");
   } catch (err) {
-    console.error("❌ Error de conexión a la base de datos:", err.message);
+    console.error("❌ Error de conexión:", err.message);
     process.exit(1);
   }
 })();

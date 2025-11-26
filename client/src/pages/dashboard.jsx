@@ -1,34 +1,43 @@
 import React, { useEffect, useState } from "react";
 import FormVehiculo from "./FormVehiculo";
+import MisAgendamientos from "./MisAgendamientos";
+import Perfil from "./Perfil";
 
-const Dashboard = ({ user, onLogout }) => {
+const Dashboard = ({ user, token, onLogout }) => {
   const fechaActual = new Date().toLocaleDateString();
+
   const [showForm, setShowForm] = useState(false);
+  const [view, setView] = useState("inicio");
+
+  const [userData, setUserData] = useState(user);
 
   useEffect(() => {
-    document.body.style.margin = 0;
-    document.body.style.padding = 0;
-    document.body.style.height = "100vh";
-    document.documentElement.style.height = "100vh";
-    document.body.style.backgroundColor = "#000";
+    // Permitir scroll normal del body
+    document.body.style.overflow = "auto";
   }, []);
 
   return (
     <>
-      {showForm && <FormVehiculo onClose={() => setShowForm(false)} userId={user.idPersona} />}
-      
+      {showForm && (
+        <FormVehiculo
+          onClose={() => setShowForm(false)}
+          userId={userData.idPersona}
+          token={token}
+        />
+      )}
+
+      {/* CONTENEDOR PRINCIPAL */}
       <div
         style={{
-          minHeight: "100vh",
+          minHeight: "100vh", // <-- PERMITE CRECER, NO CORTA NADA
           width: "100vw",
           display: "flex",
           flexDirection: "column",
           fontFamily: "Arial, sans-serif",
-          margin: 0,
-          padding: 0,
+          backgroundColor: "#000",
         }}
       >
-        {/* Navbar */}
+        {/* NAVBAR */}
         <div
           style={{
             width: "100%",
@@ -44,20 +53,19 @@ const Dashboard = ({ user, onLogout }) => {
           <img
             src="/logo.png"
             alt="Logo Parking Now"
-            style={{ height: "100px", marginBottom: "20px" }}
+            style={{ height: "100px", marginBottom: "10px" }}
           />
         </div>
 
-        {/* Contenedor principal */}
+        {/* CONTENIDO PRINCIPAL */}
         <div
           style={{
             display: "flex",
             flex: 1,
-            height: "100%",
-            overflow: "hidden",
+            overflow: "auto",
           }}
         >
-          {/* Barra lateral */}
+          {/* SIDEBAR */}
           <aside
             style={{
               width: "260px",
@@ -66,25 +74,35 @@ const Dashboard = ({ user, onLogout }) => {
               display: "flex",
               flexDirection: "column",
               justifyContent: "space-between",
-              padding: "25px",
+              padding: "20px",
+              height: "100%",
             }}
           >
-            {/* Información del usuario */}
             <div>
+              <img
+                src={
+                  userData.foto
+                    ? `http://localhost:3000/uploads/${userData.foto}`
+                    : "/default-avatar.png"
+                }
+                alt="Foto perfil"
+                style={{
+                  width: "90px",
+                  height: "90px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "3px solid #FFD700",
+                  marginBottom: "15px",
+                }}
+              />
+
               <h2 style={{ margin: "0 0 10px 0" }}>
-                {user.nombre} {user.apellido}
+                {userData.Nombre} {userData.Apellido}
               </h2>
-              <div>
-                <p style={{ margin: "5px 0" }}>
-                  <strong>Correo:</strong> {user.correo}
-                </p>
-                <p style={{ margin: "5px 0" }}>
-                  <strong>Último acceso:</strong> {fechaActual}
-                </p>
-              </div>
+              <p><strong>Correo:</strong> {userData.correo}</p>
+              <p><strong>Último acceso:</strong> {fechaActual}</p>
             </div>
 
-            {/* Botones de la barra lateral */}
             <div
               style={{
                 display: "flex",
@@ -93,65 +111,59 @@ const Dashboard = ({ user, onLogout }) => {
                 marginTop: "20px",
               }}
             >
-              <button style={botonEstilo}>Perfil</button>
-              <button style={botonEstilo}>Configuración</button>
+              <button style={botonEstilo} onClick={() => setView("inicio")}>
+                Inicio
+              </button>
+
+              <button style={botonEstilo} onClick={() => setView("agendamientos")}>
+                Mis Agendamientos
+              </button>
+
+              <button style={botonEstilo} onClick={() => setView("perfil")}>
+                Perfil
+              </button>
+
               <button style={botonEstilo} onClick={onLogout}>
                 Cerrar sesión
               </button>
             </div>
           </aside>
 
-          {/* Contenido principal */}
+          {/* MAIN CONTENT — SCROLL REAL */}
           <main
             style={{
               flex: 1,
               backgroundColor: "#e7c311ff",
               padding: "40px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              gap: "30px",
+              overflowY: "auto",  // <-- SCROLL SUAVE 
+              maxHeight: "200%",   // <-- NO SE CORTA
             }}
           >
-            {/* Introducción */}
-            <div style={{ textAlign: "center", maxWidth: "600px" }}>
-              <h2 style={{ color: "#000" }}>¡Bienvenido a Parking Now!</h2>
-              <p style={{ color: "#000", fontSize: "18px" }}>
-                Parking Now es tu aplicación de gestión de estacionamiento. Aquí
-                puedes agendar, administrar y llevar el control de los vehículos
-                que ingresan a tu parqueadero. Nuestro objetivo es ofrecerte una
-                experiencia rápida, segura y organizada.
-              </p>
-              <p style={{ color: "#000", fontSize: "18px" }}>
-                <strong>Quiénes somos:</strong> Somos un equipo comprometido con
-                la eficiencia en la gestión de estacionamientos, brindando
-                soluciones digitales modernas para facilitar tu día a día.
-              </p>
-            </div>
+            {view === "inicio" && (
+              <>
+                <h2 style={{ color: "#000" }}>¡Bienvenido a Parking Now!</h2>
 
-            {/* Tarjetas */}
-            <div
-              style={{
-                display: "flex",
-                gap: "20px",
-                justifyContent: "center",
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={cardEstilo} onClick={() => setShowForm(true)}>
-                <p>🚘</p>
-                <h3>Agendar Vehículo</h3>
-              </div>
-              <div style={cardEstilo}>
-                <p>⚖️</p>
-                <h3>Políticas</h3>
-              </div>
-              <div style={cardEstilo}>
-                <p>🕵</p>
-                <h3>Privacidad</h3>
-              </div>
-            </div>
+                <div style={{ display: "flex", gap: "20px" }}>
+                  <div style={cardEstilo} onClick={() => setShowForm(true)}>
+                    <p style={{ fontSize: "40px" }}>🚘</p>
+                    <h3>Agendar Vehículo</h3>
+                  </div>
+
+                  <div style={cardEstilo} onClick={() => setView("agendamientos")}>
+                    <p style={{ fontSize: "40px" }}>📋</p>
+                    <h3>Mis Agendamientos</h3>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {view === "agendamientos" && (
+              <MisAgendamientos userId={userData.idPersona} token={token} />
+            )}
+
+            {view === "perfil" && (
+              <Perfil user={userData} token={token} onUserUpdate={setUserData} />
+            )}
           </main>
         </div>
       </div>
@@ -167,19 +179,16 @@ const botonEstilo = {
   color: "#000",
   cursor: "pointer",
   fontWeight: "bold",
-  fontSize: "15px",
-  transition: "all 0.2s ease-in-out",
 };
 
 const cardEstilo = {
   backgroundColor: "#dab028ff",
   padding: "30px 40px",
   borderRadius: "10px",
-  boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
   cursor: "pointer",
-  textAlign: "center",
   minWidth: "180px",
-  transition: "transform 0.2s",
+  textAlign: "center",
+  transition: "0.2s",
 };
 
 export default Dashboard;

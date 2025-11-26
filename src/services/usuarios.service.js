@@ -1,21 +1,18 @@
-const db = require('../config/db');
+const express = require("express");
+const router = express.Router();
+const authMiddleware = require("../middleware/auth.middleware");
+const usuariosController = require("../controller/usuarios.controller");
 
-exports.getUsuarios = async () => {
-  const [rows] = await db.query("SELECT * FROM usuarios");
-  return rows;
-};
+// Orden recomendado (primero rutas específicas)
+router.put("/cambiar-password/:id", authMiddleware, usuariosController.cambiarPassword);
 
-exports.createUsuario = async (data) => {
-  const { nombre, email, password } = data;
-  const [result] = await db.query(
-    "INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)",
-    [nombre, email, password]
-  );
-  return { id: result.insertId, nombre, email };
-};
+// Obtener usuario por ID
+router.get("/:id", authMiddleware, usuariosController.getUsuarioPorId);
 
-// 🔥 Nuevo método para autenticación (login)
-exports.findByEmail = async (email) => {
-  const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
-  return rows[0] || null;
-};
+// Actualizar usuario
+router.put("/:id", authMiddleware, usuariosController.updateUsuario);
+
+// Eliminar usuario
+router.delete("/:id", authMiddleware, usuariosController.deleteUsuario);
+
+module.exports = router;
