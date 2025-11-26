@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import AuthModal from "./components/AuthModal";
 import Dashboard from "./pages/dashboard";
 import DashboardAdmin from "./pages/dashboardAdmin";
-import HomePublic from "./pages/HomePublic";   // 👈 IMPORTANTE
+import HomePublic from "./pages/HomePublic";
 import "./App.css";
 
 function App() {
   const [showModal, setShowModal] = useState(false);
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || null);
-  const [modoInvitado, setModoInvitado] = useState(false); // 👈 NUEVO
+  const [modoInvitado, setModoInvitado] = useState(
+    localStorage.getItem("modoInvitado") === "true"
+  );
 
-  // Cargar usuario de localStorage si existe
+  // Cargar sesión si existe
   useEffect(() => {
     const savedUser = localStorage.getItem("usuario");
     if (savedUser) {
@@ -19,12 +21,19 @@ function App() {
     }
   }, []);
 
+  // Guardar modo invitado
+  useEffect(() => {
+    localStorage.setItem("modoInvitado", modoInvitado);
+  }, [modoInvitado]);
+
   const handleAuthSuccess = (usuario, tokenRecibido) => {
     setUser(usuario);
     setToken(tokenRecibido);
 
     localStorage.setItem("usuario", JSON.stringify(usuario));
     localStorage.setItem("token", tokenRecibido);
+    localStorage.removeItem("modoInvitado"); // 🔥 salir del modo invitado
+    setModoInvitado(false);
 
     setShowModal(false);
   };
@@ -34,9 +43,11 @@ function App() {
     setToken(null);
     localStorage.removeItem("usuario");
     localStorage.removeItem("token");
+    setModoInvitado(false);
+    localStorage.removeItem("modoInvitado");
   };
 
-  // 👈 Si el usuario entra como invitado → mostrar HomePublic
+  // 🔥 Mostrar HomePublic si es invitado
   if (modoInvitado && !user) {
     return <HomePublic onVolver={() => setModoInvitado(false)} />;
   }
@@ -53,7 +64,7 @@ function App() {
 
           <h1>Bienvenido a Parking Now</h1>
 
-          {/* BOTÓN INVITADO */}
+          {/* 🔥 BOTÓN DE INVITADO QUE HACÍA FALTA */}
           <button
             onClick={() => setModoInvitado(true)}
             style={{
@@ -61,9 +72,9 @@ function App() {
               padding: "12px 25px",
               fontSize: "16px",
               borderRadius: "8px",
-              border: "none",
+              border: "2px solid #FFD700",
               cursor: "pointer",
-              backgroundColor: "#000",
+              backgroundColor: "black",
               color: "#FFD700",
               fontWeight: "bold",
               marginRight: "10px",
@@ -99,19 +110,10 @@ function App() {
         </>
       ) : (
         <>
-          {/* Dashboard según rol */}
           {user.rol === "2" || user.rol === 2 ? (
-            <DashboardAdmin
-              user={user}
-              token={token}
-              onLogout={handleLogout}
-            />
+            <DashboardAdmin user={user} token={token} onLogout={handleLogout} />
           ) : (
-            <Dashboard
-              user={user}
-              token={token}
-              onLogout={handleLogout}
-            />
+            <Dashboard user={user} token={token} onLogout={handleLogout} />
           )}
         </>
       )}

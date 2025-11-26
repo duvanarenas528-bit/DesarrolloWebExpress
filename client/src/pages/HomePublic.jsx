@@ -80,7 +80,7 @@ const HomePublic = ({ onVolver }) => {
   );
 };
 
-/* 🎨 ESTILOS PROFESIONALES */
+/* ESTILOS PROFESIONALES */
 const styles = {
   container: {
     backgroundColor: "#000",
