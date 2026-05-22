@@ -51,12 +51,12 @@ exports.registro = async (req, res) => {
     );
 
     // Enviar email
-    await transporter.sendMail({
-      from: process.env.EMAIL_USER,
-      to: correo,
-      subject: "Código de verificación",
-      text: `Tu código es: ${codigo}`,
-    });
+   /// await transporter.sendMail({
+    ///  from: process.env.EMAIL_USER,
+     // to: correo,
+      //subject: "Código de verificación",
+     // text: `Tu código es: ${codigo}`,
+    //});
 
     res.json({ message: "Usuario registrado. Revisa tu correo." });
 
